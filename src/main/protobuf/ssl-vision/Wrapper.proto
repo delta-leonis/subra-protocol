@@ -1,3 +1,4 @@
+// source: https://github.com/RoboCup-SSL/ssl-vision/blob/eaa995dfd64056d8fb970a930e49ecbed0bf0f53/src/shared/proto/messages_robocup_ssl_wrapper.proto
 syntax = "proto2";
 option java_package = "org.robocup.ssl";
 

@@ -1,3 +1,4 @@
+// source: https://github.com/RoboCup-SSL/ssl-refbox/blob/ead58770b032ca380987cb9e1200b04b0d1db0f3/referee.proto
 syntax = "proto2";
 option java_package = "org.robocup.ssl";
 
