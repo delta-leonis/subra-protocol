@@ -159,7 +159,7 @@ uploadArchives {
             pom.project {
                 name 'subra-protocol'
                 packaging 'jar'
-                description 'the center of our world'
+                description 'protocols for subra'
                 url 'https://github.com/delta-leonis/subra-protocol/'
 
                 licenses {
