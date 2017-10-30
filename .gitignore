@@ -209,4 +209,4 @@ gradle-app.setting
 gradle/wrapper/gradle-wrapper.properties
 
 # protobuf generated files
-gen/*
+build/proto-generated-java/*

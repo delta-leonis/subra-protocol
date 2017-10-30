@@ -1,20 +1,17 @@
 import static org.apache.tools.ant.taskdefs.condition.Os.*
 
 buildscript {
+    repositories {
+        mavenCentral()
+    }
     dependencies {
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.1'
     }
 }
 
-plugins {
-    id 'com.github.ksoichiro.console.reporter' version '0.5.0'
-}
-
 apply plugin: 'java'
-apply plugin: 'jacoco'
 apply plugin: 'signing'
 apply plugin: 'maven'
-apply plugin: 'idea'
 apply plugin: 'com.google.protobuf'
 
 group 'io.leonis'
@@ -32,30 +29,24 @@ javadoc {
     classpath = configurations.compile
 }
 
+repositories {
+    mavenCentral()
+}
+
 protobuf {
     protoc {
         // The artifact spec for the Protobuf Compiler
         artifact = 'com.google.protobuf:protoc:3.3.0'
     }
-    generatedFilesBaseDir = "$projectDir/gen"
+    generatedFilesBaseDir = "$projectDir/build/proto-generated-java"
 }
 
 clean {
     delete protobuf.generatedFilesBaseDir
 }
 
-idea {
-    module {
-        sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/java")
-    }
-}
-
 compileJava {
     options.compilerArgs << '-parameters'
-}
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {
@@ -73,25 +64,6 @@ test {
         events "PASSED", "STARTED", "FAILED", "SKIPPED"
         showStandardStreams = true
     }
-}
-
-tasks.withType(Javadoc) {
-  ext.capturedOutput = [ ]
-  def listener = { ext.capturedOutput << it } as StandardOutputListener
-
-  logging.addStandardErrorListener(listener)
-  logging.addStandardOutputListener(listener)
-  options.addStringOption('Xdoclint:all', '-quiet')
-
-  doLast {
-    logging.removeStandardOutputListener(listener)
-    logging.removeStandardErrorListener(listener)
-    ext.capturedOutput.join('').with { output ->
-      if (output =~ /warning/) {
-          throw new RuntimeException("Javadoc warning found: \n" + output)
-      }
-    }
-  }
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
