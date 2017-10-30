@@ -44,26 +44,10 @@ protobuf {
 clean {
     delete protobuf.generatedFilesBaseDir
 }
-
-compileJava {
-    options.compilerArgs << '-parameters'
-}
-
 dependencies {
-    // tests
-    testCompile 'org.testng:testng:6.11'
-
     compile 'com.google.protobuf:protobuf-java:3.3.0'
 
     protobuf fileTree('src/main/protobuf/')
-}
-
-test {
-    useTestNG()
-    testLogging {
-        events "PASSED", "STARTED", "FAILED", "SKIPPED"
-        showStandardStreams = true
-    }
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
