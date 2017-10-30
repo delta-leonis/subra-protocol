@@ -18,8 +18,8 @@ group 'io.leonis'
 version '0.0.1'
 archivesBaseName = "subra-protocol"
 rootProject.description = 'protocols for subra'
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
 
 if (!isFamily(FAMILY_WINDOWS) && !isFamily(FAMILY_MAC) && !isFamily(FAMILY_UNIX))
     throw new GradleException("Unsupported operating system!")
