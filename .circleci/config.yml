@@ -32,18 +32,5 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "build.gradle" }}
-        
-      # run tests!
-      - run: gradle test
-      
-      # compile javadoc 
-      - run: gradle javadoc
-      
-      # Deploy javadoc if on master
-      - deploy:
-          name: Deploy javadoc
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-               .circleci/deploy-ghpages.sh
-            fi
 
+      - run: gradle build
