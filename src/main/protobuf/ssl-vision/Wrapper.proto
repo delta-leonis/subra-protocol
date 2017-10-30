@@ -1,0 +1,10 @@
+syntax = "proto2";
+option java_package = "org.robocup.ssl";
+
+import "Detection.proto";
+import "Geometry.proto";
+
+message WrapperPacket {
+  optional DetectionFrame detection = 1;
+  optional GeometryData   geometry  = 2;
+}

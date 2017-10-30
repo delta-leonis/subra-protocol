@@ -1,0 +1,198 @@
+import static org.apache.tools.ant.taskdefs.condition.Os.*
+
+buildscript {
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.1'
+    }
+}
+
+plugins {
+    id 'com.github.ksoichiro.console.reporter' version '0.5.0'
+}
+
+apply plugin: 'java'
+apply plugin: 'jacoco'
+apply plugin: 'signing'
+apply plugin: 'maven'
+apply plugin: 'idea'
+apply plugin: 'com.google.protobuf'
+
+group 'io.leonis'
+version '0.0.1'
+archivesBaseName = "subra-protocol"
+rootProject.description = 'protocols for subra'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+if (!isFamily(FAMILY_WINDOWS) && !isFamily(FAMILY_MAC) && !isFamily(FAMILY_UNIX))
+    throw new GradleException("Unsupported operating system!")
+
+javadoc {
+    source = sourceSets.main.allJava
+    classpath = configurations.compile
+}
+
+protobuf {
+    protoc {
+        // The artifact spec for the Protobuf Compiler
+        artifact = 'com.google.protobuf:protoc:3.3.0'
+    }
+    generatedFilesBaseDir = "$projectDir/gen"
+}
+
+clean {
+    delete protobuf.generatedFilesBaseDir
+}
+
+idea {
+    module {
+        sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/java")
+    }
+}
+
+compileJava {
+    options.compilerArgs << '-parameters'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // tests
+    testCompile 'org.testng:testng:6.11'
+
+    compile 'com.google.protobuf:protobuf-java:3.3.0'
+
+    protobuf fileTree('src/main/protobuf/')
+}
+
+test {
+    useTestNG()
+    testLogging {
+        events "PASSED", "STARTED", "FAILED", "SKIPPED"
+        showStandardStreams = true
+    }
+}
+
+tasks.withType(Javadoc) {
+  ext.capturedOutput = [ ]
+  def listener = { ext.capturedOutput << it } as StandardOutputListener
+
+  logging.addStandardErrorListener(listener)
+  logging.addStandardOutputListener(listener)
+  options.addStringOption('Xdoclint:all', '-quiet')
+
+  doLast {
+    logging.removeStandardOutputListener(listener)
+    logging.removeStandardErrorListener(listener)
+    ext.capturedOutput.join('').with { output ->
+      if (output =~ /warning/) {
+          throw new RuntimeException("Javadoc warning found: \n" + output)
+      }
+    }
+  }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+if (!project.hasProperty("signing.keyId") && System.getenv("signingKeyId") != null) {
+    allprojects { ext."signing.keyId" = System.getenv("signingKeyId") }
+}
+
+if (!project.hasProperty("signing.password") && System.getenv("signingPassword") != null) {
+    allprojects { ext."signing.password" = System.getenv("signingPassword") }
+}
+
+if (!project.hasProperty("signing.secretKeyRingFile") && System.getenv("signingSecretKeyRing") != null) {
+    def file = new File("$projectDir/secring.gpg")
+    file.createNewFile()
+    file.text = System.getenv("signingSecretKeyRing")
+    allprojects { ext."signing.secretKeyRingFile" = "$projectDir/secring.gpg" }
+}
+
+signing {
+    sign configurations.archives
+}
+
+if (project.hasProperty("sign")) {
+    signArchives.enabled = sign.toBoolean()
+} else if (System.getenv("sign") != null) {
+    signArchives.enabled = System.getenv("sign").toBoolean()
+} else {
+    signArchives.enabled = false
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                if (project.hasProperty("sonatypeUsername") && project.hasProperty("sonatypePassword")) {
+                    authentication(userName: sonatypeUsername, password: sonatypePassword)
+                } else if (System.getenv("sonatypeUsername") != null && System.getenv("sonatypePassword") != null) {
+                    authentication(userName: System.getenv("sonatypeUsername"), password: System.getenv("sonatypePassword"))
+                }
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                if (project.hasProperty("sonatypeUsername") && project.hasProperty("sonatypePassword")) {
+                    authentication(userName: sonatypeUsername, password: sonatypePassword)
+                } else if (System.getenv("sonatypeUsername") != null && System.getenv("sonatypePassword") != null) {
+                    authentication(userName: System.getenv("sonatypeUsername"), password: System.getenv("sonatypePassword"))
+                }
+            }
+
+            pom.project {
+                name 'subra-protocol'
+                packaging 'jar'
+                description 'the center of our world'
+                url 'https://github.com/delta-leonis/subra-protocol/'
+
+                licenses {
+                    license {
+                        name 'AGPL'
+                        url 'https://github.com/delta-leonis/subra-protocol/blob/master/LICENSE'
+                        distribution 'repo'
+                    }
+                }
+                scm {
+                    url 'https://github.com/delta-leonis/subra-protocol/'
+                    connection 'scm:git:git://github.com/delta-leonis/subra-protocol.git'
+                    developerConnection 'scm:git:ssh://git@github.com/delta-leonis/subra-protocol.git'
+                }
+                developers {
+                    developer {
+                        id 'romni'
+                        name 'Rimon Oz'
+                    }
+                    developer {
+                        id 'thumbnail'
+                        name 'Jeroen de Jong'
+                    }
+                    developer {
+                        id 'RyanMeulenkamp'
+                        name 'Ryan Meulenkamp'
+                    }
+                    developer {
+                        id 'ThomasHakkers'
+                        name 'Thomas Hakkers'
+                    }
+                }
+            }
+        }
+    }
+}
