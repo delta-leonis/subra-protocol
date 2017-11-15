@@ -1,17 +1,27 @@
 # `subra-protocol`
-> project subra-protocol v1.0-SNAPSHOT
+> protocols for subra
 
 
 You'll need at least Java 1.8 ([jre](https://www.java.com/download/)
-/[jdk](http://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html)) 
+/[jdk](http://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html))
 to run `subra-protocol`.
 
-## How to use
+## Dependency
 
-In order to use `subra-protocol` clone this repository:
+#### Maven
 
 ```
-  git clone git@github.com:delta-leonis/subra-protocol.git
+<dependency>
+    <groupId>io.leonis</groupId>
+    <artifactId>subra-protocol</artifactId>
+    <version>0.0.1</version>
+</dependency>
+```
+
+#### Gradle
+
+```
+compile 'io.leonis:subra-protocol:0.0.1'
 ```
 
 ## Documentation
@@ -31,7 +41,7 @@ Make sure you have `gradle>=v2.10` installed. Run the following to build the app
 This project is licensed under the AGPL version 3 license (see LICENSE).
 
 ```
-subra-protocol - project subra-protocol v1.0-SNAPSHOT
+subra-protocol - delta-leonis
 Copyright (C) 2017 Rimon Oz, Jeroen de Jong, Ryan Meulenkamp, Thomas Hakkers
 
 This program is free software: you can redistribute it and/or modify
