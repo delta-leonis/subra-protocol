@@ -15,7 +15,7 @@ apply plugin: 'maven'
 apply plugin: 'com.google.protobuf'
 
 group 'io.leonis'
-version '0.0.1'
+version '0.0.2'
 archivesBaseName = "subra-protocol"
 rootProject.description = 'protocols for subra'
 sourceCompatibility = 1.6

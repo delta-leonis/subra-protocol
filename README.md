@@ -14,14 +14,14 @@ to run `subra-protocol`.
 <dependency>
     <groupId>io.leonis</groupId>
     <artifactId>subra-protocol</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
 </dependency>
 ```
 
 #### Gradle
 
 ```
-compile 'io.leonis:subra-protocol:0.0.1'
+compile 'io.leonis:subra-protocol:0.0.2'
 ```
 
 ## Documentation
